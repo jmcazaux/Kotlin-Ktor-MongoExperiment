@@ -1,14 +1,14 @@
 package com.ironbird.plugins
 
-import com.mongodb.client.MongoCollection
-import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.bson.Document
 import org.bson.types.ObjectId
 
@@ -28,11 +28,13 @@ data class Car(
 }
 
 class CarService(private val database: MongoDatabase) {
-    var collection: MongoCollection<Document>
+    lateinit var collection: MongoCollection<Document>
 
     init {
-        database.createCollection("cars")
-        collection = database.getCollection("cars")
+        suspend {
+            database.createCollection("cars")
+            collection = database.getCollection("cars")
+        }
     }
 
     // Create new car

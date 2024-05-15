@@ -1,12 +1,13 @@
 package com.ironbird.domain.entity
 
-import java.util.UUID
+import java.util.*
 
-
-data class Book(
+data class BookAuthor(
     var id: UUID,
-    var title: String,
-    var author_id: UUID,
+    var firstName: String,
+    var lastName: String,
 ) {
-    var description: String? = null
+    constructor(author: Author) : this(author.id, author.firstName, author.lastName)
 }
+
+data class Book(val id: UUID, var title: String, var author: BookAuthor, var description: String?)

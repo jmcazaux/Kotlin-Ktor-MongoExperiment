@@ -2,6 +2,7 @@
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val mongodb_version: String by project
 
 plugins {
     kotlin("jvm") version "1.9.24"
@@ -24,18 +25,21 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    implementation("org.mongodb:mongodb-driver-core:4.9.0")
-    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
-    implementation("org.mongodb:bson:4.9.0")
-    implementation("io.ktor:ktor-server-swagger-jvm")
-    implementation("io.ktor:ktor-server-openapi")
-    implementation("io.ktor:ktor-server-host-common-jvm")
-    implementation("io.ktor:ktor-server-resources")
-    implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+
+    implementation("io.ktor:ktor-server-content-negotiation-jvm")
+    implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-server-host-common-jvm")
+    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-openapi")
+    implementation("io.ktor:ktor-server-resources")
+    implementation("io.ktor:ktor-server-swagger-jvm")
+
+    implementation("org.mongodb:bson-kotlinx:$mongodb_version")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodb_version")
+
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

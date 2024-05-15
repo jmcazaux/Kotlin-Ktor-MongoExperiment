@@ -12,6 +12,5 @@ data class Author(
     val id: UUID = UUID.randomUUID(),
     var firstName: String,
     var lastName: String,
-) {
     var biography: String? = null
-}
+)
