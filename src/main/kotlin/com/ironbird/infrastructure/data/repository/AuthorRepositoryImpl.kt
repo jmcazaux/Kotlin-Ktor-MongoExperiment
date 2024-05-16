@@ -1,4 +1,4 @@
-package com.ironbird.infrastructure.repository
+package com.ironbird.infrastructure.data.repository
 
 import com.ironbird.application.data.AuthorRepository
 import com.ironbird.domain.entity.Author

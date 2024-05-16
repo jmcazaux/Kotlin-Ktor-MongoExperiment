@@ -40,13 +40,22 @@ dependencies {
     implementation("org.mongodb:bson-kotlinx:$mongodb_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodb_version")
 
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 
 tasks.withType<Test> {
+    useJUnitPlatform()
     testLogging {
         showStandardStreams = true
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 }
