@@ -1,6 +1,8 @@
 package com.ironbird.infrastructure.data.repository
 
 import com.ironbird.application.data.AuthorRepository
+import com.ironbird.commons.exceptions.DuplicateEntityException
+import com.ironbird.commons.exceptions.WriteDataException
 import com.ironbird.domain.entity.Author
 import com.ironbird.infrastructure.data.AuthorSchema
 import com.ironbird.infrastructure.data.AuthorSchemaFields
@@ -19,6 +21,13 @@ import java.util.*
 
 internal val LOGGER = KtorSimpleLogger(AuthorRepositoryImpl::class.simpleName!!)
 private const val AUTHORS_COLLECTION = "authors"
+
+private val DUPLICATE_AUTHOR_NAME_MESSAGE_REGEX = Regex(
+    "E11000 duplicate key .* dup key: \\{ firstName: .*, lastName: .* }"
+)
+private val DUPLICATE_ID_MESSAGE_REGEX = Regex(
+    "E11000 duplicate key .* dup key: \\{ id: .* }"
+)
 
 class AuthorRepositoryImpl(private val database: MongoDatabase) : AuthorRepository {
     private var collection: MongoCollection<AuthorSchema>
@@ -39,11 +48,23 @@ class AuthorRepositoryImpl(private val database: MongoDatabase) : AuthorReposito
 
     override suspend fun saveAuthor(author: Author) = withContext(Dispatchers.IO) {
         try {
-            collection.insertOne(AuthorSchema(author)).insertedId?.toString()
-                ?: throw IllegalArgumentException("Author not saved")
+            collection.insertOne(AuthorSchema(author)).insertedId
+                ?: throw WriteDataException("Author not saved.")
+            author
         } catch (e: MongoWriteException) {
-            LOGGER.error("Author already exists", e)
-            throw IllegalArgumentException("Author already exists")
+            // e.error.message have the following form:
+            // "E11000 duplicate key error collection: <db.coll> index: <name> dup key: { k1: v1, k2: v2<, ...> }"
+            // The below identifies the actual duplicated  key in order to form a meaningful message
+            val mongoMessage = e.error.message
+            val message = when {
+                DUPLICATE_AUTHOR_NAME_MESSAGE_REGEX.containsMatchIn(mongoMessage) ->
+                    "Author \"${author.firstName} ${author.lastName}\" already exists"
+                DUPLICATE_ID_MESSAGE_REGEX.containsMatchIn(mongoMessage) ->
+                    "Author with ID \"${author.id}\" already exists"
+                else -> "Unexpected database write error"
+            }
+
+            throw DuplicateEntityException("$message... Author not saved.", e)
         }
     }
 

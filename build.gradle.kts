@@ -1,13 +1,16 @@
 
 val ktor_version: String by project
-val kotlin_version: String by project
+val kotlin_version: String by System.getProperties()
 val logback_version: String by project
 val mongodb_version: String by project
+val kotest_version: String by project
+val testcontainers_version: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.24"
+    val kotlin_version: String by System.getProperties()
+    kotlin("jvm") version kotlin_version
     id("io.ktor.plugin") version "2.3.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
+    id("org.jetbrains.kotlin.plugin.serialization") version kotlin_version
 }
 
 group = "com.ironbird"
@@ -40,12 +43,17 @@ dependencies {
     implementation("org.mongodb:bson-kotlinx:$mongodb_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodb_version")
 
+    testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$kotlin_version")
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainers_version"))
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mongodb")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

@@ -2,6 +2,7 @@ package com.ironbird.infrastructure.data
 
 
 import com.ironbird.infrastructure.data.repository.AuthorRepositoryImpl
+import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -9,6 +10,7 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import org.bson.UuidRepresentation
 
+const val DATABASE_NAME = "ironbird_library"
 
 /**
  * Establishes connection with a MongoDB database.
@@ -33,20 +35,34 @@ fun Application.connectToMongoDB(): MongoDatabase {
     val host = environment.config.tryGetString("db.mongo.host") ?: "127.0.0.1"
     val port = environment.config.tryGetString("db.mongo.port") ?: "27017"
     val maxPoolSize = environment.config.tryGetString("db.mongo.maxPoolSize")?.toInt() ?: 20
-    val databaseName = environment.config.tryGetString("db.mongo.database.name") ?: "ironbird_library"
+    val databaseName = environment.config.tryGetString("db.mongo.database.name") ?: DATABASE_NAME
 
     val credentials = user?.let { userVal -> password?.let { passwordVal -> "$userVal:$passwordVal@" } }.orEmpty()
     val uri = "mongodb://$credentials$host:$port/?maxPoolSize=$maxPoolSize&w=majority"
 
-    val mongoClient = MongoClient.create(uri)
-    val clientSettings = MongoClientSettings.builder().uuidRepresentation(UuidRepresentation.STANDARD).build()
-    val database = MongoClient.create(clientSettings).getDatabase(databaseName)
+    val (mongoClient, database) = createMongoClientAndDatabase(uri, databaseName)
 
     environment.monitor.subscribe(ApplicationStopped) {
         mongoClient.close()
     }
 
     return database
+}
+
+internal fun createMongoClientAndDatabase(
+    uri: String,
+    databaseName: String
+): Pair<MongoClient, MongoDatabase> {
+
+    val mongoClient = MongoClient.create(
+        MongoClientSettings.builder()
+            .applyConnectionString(ConnectionString(uri))
+            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .build()
+    )
+
+    val database = mongoClient.getDatabase(databaseName)
+    return Pair(mongoClient, database)
 }
 
 fun Application.getAuthorRepository(): AuthorRepositoryImpl {

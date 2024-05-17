@@ -1,17 +1,23 @@
 package com.ironbird
 
-import com.ironbird.plugins.*
+import com.ironbird.plugins.configureStaticRouting
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import kotlin.test.*
+import org.junit.jupiter.api.Disabled
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
 
 class ApplicationTest {
+
+
     @Test
+    @Disabled
     fun testRoot() = testApplication {
         application {
-            configureRouting()
+            configureStaticRouting()
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)

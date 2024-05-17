@@ -1,6 +1,6 @@
 package com.ironbird.infrastructure.api
 
-import com.ironbird.application.use_case.AuthorUseCases
+import com.ironbird.application.usecase.AuthorUseCases
 import com.ironbird.domain.entity.Author
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -19,7 +19,7 @@ data class AuthorSchema(val id: String, val firstName: String, val lastName: Str
 @Serializable
 data class UpdateAuthorSchema(val id: String, val biography: String)
 
-fun Route.configureAuthorRouting(authorUseCases: AuthorUseCases)
+fun Route.configureAuthorsRouting(authorUseCases: AuthorUseCases)
 {
     post {
         val authorRequest = call.receive(CreateAuthorSchema::class)
