@@ -2,7 +2,7 @@ package com.ironbird.infrastructure.data.repository
 
 import com.ironbird.application.data.AuthorRepository
 import com.ironbird.commons.exceptions.DuplicateEntityException
-import com.ironbird.commons.exceptions.WriteDataException
+import com.ironbird.commons.exceptions.DataWriteException
 import com.ironbird.domain.entity.Author
 import com.ironbird.infrastructure.data.AuthorSchema
 import com.ironbird.infrastructure.data.AuthorSchemaFields
@@ -49,7 +49,7 @@ class AuthorRepositoryImpl(private val database: MongoDatabase) : AuthorReposito
     override suspend fun saveAuthor(author: Author) = withContext(Dispatchers.IO) {
         try {
             collection.insertOne(AuthorSchema(author)).insertedId
-                ?: throw WriteDataException("Author not saved.")
+                ?: throw DataWriteException("Author not saved.")
             author
         } catch (e: MongoWriteException) {
             // e.error.message have the following form:
