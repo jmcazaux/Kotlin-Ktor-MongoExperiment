@@ -125,16 +125,16 @@ class AuthorRepositoryImplTest {
 
     @Test
     fun `findAuthorById should return the author when exists`() {
-        throw NotImplementedError("Not implemented")
+        TODO("Test not implemented yet!")
     }
 
     @Test
     fun `findAuthorById should return null when not exists`() {
-        throw NotImplementedError("Not implemented")
+        TODO("Test not implemented yet!")
     }
 
     @Test
     fun `findAuthorByName  should return the author when exists`() {
-        throw NotImplementedError("Not implemented")
+        TODO("Test not implemented yet!")
     }
 }

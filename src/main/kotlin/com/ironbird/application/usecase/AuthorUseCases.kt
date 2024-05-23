@@ -4,30 +4,29 @@ import com.ironbird.application.data.AuthorRepository
 import com.ironbird.domain.entity.Author
 
 interface AuthorUseCases {
-    fun createAuthor(firstName: String, lastName: String): Author?
-    fun getAuthor(id: String): Author?
-    fun updateAuthor(id: String, biography: String): Author?
-    fun deleteAuthor(id: String): Boolean
+    suspend fun createAuthor(firstName: String, lastName: String): Author
+    suspend fun getAuthor(id: String): Author?
+    suspend fun updateAuthor(id: String, biography: String): Author?
+    suspend fun deleteAuthor(id: String): Boolean
 }
 
 class AuthorUseCasesImpl(private val authorRepository: AuthorRepository) : AuthorUseCases {
-    override fun createAuthor(firstName: String, lastName: String): Author? {
-        throw NotImplementedError("Not implemented")
-//        val author = Author(firstName = firstName, lastName = lastName)
-//        authorRepository.saveAuthor(author)
-//        return author.id.toString()
+    override suspend fun createAuthor(firstName: String, lastName: String): Author {
+        val author = Author(firstName = firstName, lastName = lastName)
+        authorRepository.saveAuthor(author)
+        return author
     }
 
 
-    override fun getAuthor(id: String): Author? {
-        throw NotImplementedError("Not implemented")
+    override suspend fun getAuthor(id: String): Author? {
+        TODO("Test not implemented yet!")
     }
 
-    override fun updateAuthor(id: String, biography: String): Author? {
-        throw NotImplementedError("Not implemented")
+    override suspend fun updateAuthor(id: String, biography: String): Author? {
+        TODO("Test not implemented yet!")
     }
 
-    override fun deleteAuthor(id: String): Boolean {
-        throw NotImplementedError("Not implemented")
+    override suspend fun deleteAuthor(id: String): Boolean {
+        TODO("Test not implemented yet!")
     }
 }

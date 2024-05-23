@@ -5,6 +5,7 @@ val logback_version: String by project
 val mongodb_version: String by project
 val kotest_version: String by project
 val testcontainers_version: String by project
+val mockk_version: String by project
 
 plugins {
     val kotlin_version: String by System.getProperties()
@@ -43,10 +44,16 @@ dependencies {
     implementation("org.mongodb:bson-kotlinx:$mongodb_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodb_version")
 
+
     testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
+
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
+
+    testImplementation("io.mockk:mockk:${mockk_version}")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$kotlin_version")
+
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
