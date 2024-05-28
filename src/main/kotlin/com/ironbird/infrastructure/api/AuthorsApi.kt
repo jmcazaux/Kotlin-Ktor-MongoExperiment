@@ -1,7 +1,9 @@
 package com.ironbird.infrastructure.api
 
 import com.ironbird.application.usecase.AuthorUseCases
+import com.ironbird.commons.exceptions.DuplicateEntityException
 import com.ironbird.domain.entity.Author
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -22,9 +24,14 @@ data class UpdateAuthorSchema(val id: String, val biography: String)
 fun Route.configureAuthorsRouting(authorUseCases: AuthorUseCases)
 {
     post {
-        val authorRequest = call.receive(CreateAuthorSchema::class)
-        val author: Author = authorUseCases.createAuthor(authorRequest.firstName, authorRequest.lastName)
-            ?: return@post call.respond("Error creating author")
-        call.respond(AuthorSchema(author))
+        try {
+            val authorRequest = call.receive<CreateAuthorSchema>()
+            val author: Author = authorUseCases.createAuthor(authorRequest.firstName, authorRequest.lastName)
+            call.respond(AuthorSchema(author))
+        } catch (e: DuplicateEntityException) {
+            call.respondText(e.message ?: "", status = HttpStatusCode.Conflict)
+        } catch (e: Exception) {
+            call.respondText(e.message ?: "", status = HttpStatusCode.InternalServerError)
+        }
     }
 }

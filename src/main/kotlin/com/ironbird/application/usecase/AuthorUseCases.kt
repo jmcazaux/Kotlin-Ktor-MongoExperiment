@@ -19,14 +19,14 @@ class AuthorUseCasesImpl(private val authorRepository: AuthorRepository) : Autho
 
 
     override suspend fun getAuthor(id: String): Author? {
-        TODO("Test not implemented yet!")
+        TODO("Not implemented yet!")
     }
 
     override suspend fun updateAuthor(id: String, biography: String): Author? {
-        TODO("Test not implemented yet!")
+        TODO("Not implemented yet!")
     }
 
     override suspend fun deleteAuthor(id: String): Boolean {
-        TODO("Test not implemented yet!")
+        TODO("Not implemented yet!")
     }
 }

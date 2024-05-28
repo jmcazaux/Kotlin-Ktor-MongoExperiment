@@ -67,18 +67,4 @@ class AuthorUseCasesImplTest {
         exception.message shouldBe "SOME_MESSAGE"
     }
 
-    @Test
-    fun getAuthor() {
-        TODO("Test not implemented yet!")
-    }
-
-    @Test
-    fun updateAuthor() {
-        TODO("Test not implemented yet!")
-    }
-
-    @Test
-    fun deleteAuthor() {
-        TODO("Test not implemented yet!")
-    }
 }

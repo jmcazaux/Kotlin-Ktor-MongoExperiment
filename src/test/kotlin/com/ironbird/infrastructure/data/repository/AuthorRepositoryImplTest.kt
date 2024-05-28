@@ -2,17 +2,15 @@ package com.ironbird.infrastructure.data.repository
 
 import com.ironbird.commons.exceptions.DuplicateEntityException
 import com.ironbird.domain.entity.Author
-import com.ironbird.infrastructure.data.AuthorSchemaFields
+import com.ironbird.helpers.checkSavedAuthor
 import com.ironbird.infrastructure.data.DATABASE_NAME
 import com.ironbird.infrastructure.data.createMongoClientAndDatabase
-import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.startWith
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +18,7 @@ import org.junit.jupiter.api.Test
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.util.UUID
+import java.util.*
 
 @Testcontainers
 class AuthorRepositoryImplTest {
@@ -69,15 +67,12 @@ class AuthorRepositoryImplTest {
         returnedAuthor shouldBe author
 
         // AND author should be saved into the database's "authors" collection
-        val authorCollection = database.getCollection<Map<String, Any>>("authors")
-        val savedAuthor =
-            runBlocking {
-                authorCollection.find(Filters.eq(AuthorSchemaFields.ID.value, author.id)).first()
-            }
-
-        savedAuthor["firstName"] shouldBe "John"
-        savedAuthor["lastName"] shouldBe "Doe"
-
+        checkSavedAuthor(
+            database,
+            savedAuthorId = returnedAuthor!!.id,
+            expectedFirstname = "John",
+            expectedLastname = "Doe"
+        )
     }
 
     @Test
@@ -121,20 +116,5 @@ class AuthorRepositoryImplTest {
         }
         // AND the message should be relevant
         exception.message should startWith("Author with ID \"${id1}\" already exists")
-    }
-
-    @Test
-    fun `findAuthorById should return the author when exists`() {
-        TODO("Test not implemented yet!")
-    }
-
-    @Test
-    fun `findAuthorById should return null when not exists`() {
-        TODO("Test not implemented yet!")
-    }
-
-    @Test
-    fun `findAuthorByName  should return the author when exists`() {
-        TODO("Test not implemented yet!")
     }
 }
