@@ -95,7 +95,7 @@ class AuthorsApiTest {
             val client = configureApplicationAndCreateClient(MONGO_SERVER)
 
             // WHEN the client POSTs on /api/authors with the correct payload
-            val response = client.post("/authors") {
+            val response = client.post("/api/authors") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(CreateAuthorSchema("Jet", "Brains"))
@@ -129,14 +129,14 @@ class AuthorsApiTest {
             val client = configureApplicationAndCreateClient(MONGO_SERVER)
 
             // AND a "John Doe" author is created
-            client.post("/authors") {
+            client.post("/api/authors") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(CreateAuthorSchema("John", "Doe"))
             }
 
             // WHEN I try to create a John Doe again
-            val response = client.post("/authors") {
+            val response = client.post("/api/authors") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(CreateAuthorSchema("John", "Doe"))

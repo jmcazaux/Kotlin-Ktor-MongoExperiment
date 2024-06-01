@@ -33,6 +33,7 @@ fun Application.module() {
 
     LOGGER.trace("Configuring API documentation...")
     configureApiDocumentation()
+
     LOGGER.trace("Configuring static routing...")
     configureStaticRouting()
 
@@ -40,8 +41,8 @@ fun Application.module() {
 
     LOGGER.trace("Configuring routing...")
     routing {
-        LOGGER.trace("Configuring \"/authors\" routes...")
-        route("/authors") {
+        LOGGER.trace("Configuring \"/api/authors\" routes...")
+        route("/api/authors") {
             configureAuthorsRouting(AuthorUseCasesImpl(authorRepository))
         }
     }
