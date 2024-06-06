@@ -5,7 +5,6 @@ import com.ironbird.infrastructure.api.AuthorSchema
 import com.ironbird.infrastructure.api.CreateAuthorSchema
 import com.ironbird.infrastructure.data.DATABASE_NAME
 import com.ironbird.infrastructure.data.createMongoClientAndDatabase
-import com.ironbird.module
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.kotest.matchers.shouldBe
@@ -30,17 +29,15 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.*
 
 private fun ApplicationTestBuilder.configureApplicationAndCreateClient(mongoServer: MongoDBContainer): HttpClient {
+
+    // We create a tuned application environment (using TestContainers's Mongo port)
     val mongoPort = mongoServer.getMappedPort(27017)
     environment {
+        config = ApplicationConfig("application.conf")
         config = config.mergeWith(MapApplicationConfig("db.mongo.port" to "$mongoPort"))
     }
 
-    application {
-        module()
-    }
-
-
-    // AND a client
+    // and we create a client to be used in the tests
     val client = createClient {
         install(ContentNegotiation) {
             json(Json {
@@ -52,9 +49,11 @@ private fun ApplicationTestBuilder.configureApplicationAndCreateClient(mongoServ
     return client
 }
 
-@Testcontainers
-class AuthorsApiTest {
+private const val JET = "Jet"
+private const val BRAINS = "Brains"
 
+@Testcontainers
+class AuthorsApiE2eTest {
 
     companion object {
         @Container
@@ -98,7 +97,7 @@ class AuthorsApiTest {
             val response = client.post("/api/authors") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody(CreateAuthorSchema("Jet", "Brains"))
+                setBody(CreateAuthorSchema(JET, BRAINS))
             }
 
             // THEN I get an HTTP 200
@@ -106,16 +105,16 @@ class AuthorsApiTest {
 
             // AND the author is returned
             val returnedAuthor = Json.decodeFromString<AuthorSchema>(response.bodyAsText())
-            returnedAuthor.firstName shouldBe "Jet"
-            returnedAuthor.lastName shouldBe "Brains"
+            returnedAuthor.firstName shouldBe JET
+            returnedAuthor.lastName shouldBe BRAINS
             returnedAuthor.id shouldNotBe null
 
             // AND the author has been saved into the database
             checkSavedAuthor(
                 database,
                 savedAuthorId = UUID.fromString(returnedAuthor.id),
-                expectedFirstname = "Jet",
-                expectedLastname = "Brains"
+                expectedFirstname = JET,
+                expectedLastname = BRAINS
             )
         }
     }
