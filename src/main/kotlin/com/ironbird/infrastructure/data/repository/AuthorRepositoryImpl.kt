@@ -1,8 +1,8 @@
 package com.ironbird.infrastructure.data.repository
 
 import com.ironbird.application.data.AuthorRepository
-import com.ironbird.commons.exceptions.DuplicateEntityException
 import com.ironbird.commons.exceptions.DataWriteException
+import com.ironbird.commons.exceptions.DuplicateEntityException
 import com.ironbird.domain.entity.Author
 import com.ironbird.infrastructure.data.AuthorSchema
 import com.ironbird.infrastructure.data.AuthorSchemaFields
@@ -12,7 +12,7 @@ import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.Indexes
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import io.ktor.util.logging.*
+import io.ktor.util.logging.KtorSimpleLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -37,10 +37,8 @@ class AuthorRepositoryImpl(private val database: MongoDatabase) : AuthorReposito
             database.createCollection(AUTHORS_COLLECTION)
             collection = database.getCollection(AUTHORS_COLLECTION)
             collection.createIndex(
-                Indexes.ascending(
-                    AuthorSchemaFields.FIRST_NAME.value,
-                    AuthorSchemaFields.LAST_NAME.value
-                ), IndexOptions().unique(true)
+                Indexes.ascending(AuthorSchemaFields.FIRST_NAME.value, AuthorSchemaFields.LAST_NAME.value),
+                IndexOptions().unique(true)
             )
             collection.createIndex(Indexes.ascending(AuthorSchemaFields.ID.value), IndexOptions().unique(true))
         }

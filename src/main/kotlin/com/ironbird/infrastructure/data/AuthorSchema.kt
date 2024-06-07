@@ -13,7 +13,6 @@ enum class AuthorSchemaFields(val value: String) {
     BIOGRAPHY("biography")
 }
 
-
 data class AuthorSchema(
     @BsonId
     val mongoId: ObjectId = ObjectId(),

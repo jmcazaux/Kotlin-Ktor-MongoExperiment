@@ -1,5 +1,8 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 val ktorVersion: String by System.getProperties()
 val kotlinVersion: String by System.getProperties()
+val detektVersion: String by System.getProperties()
 val logbackVersion: String by project
 val mongodbVersion: String by project
 val kotestVersion: String by project
@@ -9,9 +12,13 @@ val mockkVersion: String by project
 plugins {
     val kotlinVersion: String by System.getProperties()
     val ktorVersion: String by System.getProperties()
+    val detektVersion: String by System.getProperties()
+
     kotlin("jvm") version kotlinVersion
+
     id("io.ktor.plugin") version ktorVersion
     id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
+    id("io.gitlab.arturbosch.detekt") version detektVersion
 }
 
 group = "com.ironbird"
@@ -63,6 +70,8 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
 }
 
 
@@ -73,5 +82,15 @@ tasks.withType<Test> {
         testLogging {
             events("passed", "skipped", "failed")
         }
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(true)
     }
 }

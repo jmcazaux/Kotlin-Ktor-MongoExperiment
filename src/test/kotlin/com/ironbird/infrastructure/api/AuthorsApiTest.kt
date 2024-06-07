@@ -7,15 +7,21 @@ import com.ironbird.domain.entity.Author
 import com.mongodb.MongoClientException
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.config.*
-import io.ktor.server.routing.*
-import io.ktor.server.testing.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.routing.route
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -28,19 +34,19 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
-
 private fun ApplicationTestBuilder.configureApplicationAndCreateClient(authorUseCases: AuthorUseCases): HttpClient {
-
     // We create a tuned application environment where we do not want the default modules
     environment {
         config = ApplicationConfig("")
     }
 
     install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-        })
+        json(
+            Json {
+                prettyPrint = true
+                isLenient = true
+            }
+        )
     }
 
     // We configure the author's routing with the provided use case (mocked or not)
@@ -53,15 +59,16 @@ private fun ApplicationTestBuilder.configureApplicationAndCreateClient(authorUse
     // and we create a client to be used in the tests
     val client = createClient {
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                }
+            )
         }
     }
     return client
 }
-
 
 private const val JET = "Jet"
 private const val BRAINS = "Brains"
@@ -70,7 +77,6 @@ class AuthorsApiTest {
 
     @Test
     fun `POST on authors calls createAuthor and returns the author`() {
-
         // GIVEN an application created with a mocked use case
         val authorUseCases = mockk<AuthorUseCases>()
         coEvery {
@@ -132,7 +138,9 @@ class AuthorsApiTest {
 
     @ParameterizedTest(name = "{index} -> with exception of type ''{0}''")
     @MethodSource("generateExceptions")
-    fun `POST on authors returns HTTP 500 Internal Server Error when the use case throws any other exception`(exception: Exception) {
+    fun `POST on authors returns HTTP 500 Internal Server Error when the use case throws any other exception`(
+        exception: Exception
+    ) {
         val authorUseCases = mockk<AuthorUseCases>()
         coEvery {
             authorUseCases.createAuthor(any<String>(), any<String>())

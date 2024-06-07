@@ -3,11 +3,13 @@ package com.ironbird.infrastructure.api
 import com.ironbird.application.usecase.AuthorUseCases
 import com.ironbird.commons.exceptions.DuplicateEntityException
 import com.ironbird.domain.entity.Author
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,8 +23,8 @@ data class AuthorSchema(val id: String, val firstName: String, val lastName: Str
 @Serializable
 data class UpdateAuthorSchema(val id: String, val biography: String)
 
-fun Route.configureAuthorsRouting(authorUseCases: AuthorUseCases)
-{
+@Suppress("detekt:TooGenericExceptionCaught")
+fun Route.configureAuthorsRouting(authorUseCases: AuthorUseCases) {
     post {
         try {
             val authorRequest = call.receive<CreateAuthorSchema>()

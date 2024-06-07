@@ -66,5 +66,4 @@ class AuthorUseCasesImplTest {
         // AND the exception message should not be altered
         exception.message shouldBe "SOME_MESSAGE"
     }
-
 }

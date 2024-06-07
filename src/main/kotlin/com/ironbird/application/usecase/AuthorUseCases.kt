@@ -17,7 +17,6 @@ class AuthorUseCasesImpl(private val authorRepository: AuthorRepository) : Autho
         return author
     }
 
-
     override suspend fun getAuthor(id: String): Author? {
         TODO("Not implemented yet!")
     }

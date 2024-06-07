@@ -9,7 +9,8 @@ import kotlinx.coroutines.runBlocking
 import java.util.*
 
 /**
- * Checks that an author with savedAuthorId has been saved in database, and it has expectedFirstname and expectedLastname
+ * Checks that an author with savedAuthorId has been saved in database, and it has expectedFirstname
+ * and expectedLastname
  */
 fun checkSavedAuthor(
     database: MongoDatabase,

@@ -10,14 +10,22 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldMatch
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.config.*
-import io.ktor.server.testing.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.config.MapApplicationConfig
+import io.ktor.server.config.mergeWith
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.AfterEach
@@ -29,7 +37,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.*
 
 private fun ApplicationTestBuilder.configureApplicationAndCreateClient(mongoServer: MongoDBContainer): HttpClient {
-
     // We create a tuned application environment (using TestContainers's Mongo port)
     val mongoPort = mongoServer.getMappedPort(27017)
     environment {
@@ -40,10 +47,12 @@ private fun ApplicationTestBuilder.configureApplicationAndCreateClient(mongoServ
     // and we create a client to be used in the tests
     val client = createClient {
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                }
+            )
         }
     }
     return client
@@ -64,7 +73,6 @@ class AuthorsApiE2eTest {
     private lateinit var mongoClient: MongoClient
     private lateinit var database: MongoDatabase
 
-
     @BeforeEach
     fun connectToDb() {
         val mongoPort = MONGO_SERVER.getMappedPort(27017)
@@ -76,7 +84,6 @@ class AuthorsApiE2eTest {
         }
     }
 
-
     @AfterEach
     fun closeDb() {
         runBlocking {
@@ -85,10 +92,8 @@ class AuthorsApiE2eTest {
         mongoClient.close()
     }
 
-
     @Test
     fun `POST on authors should return the created author`() {
-
         // GIVEN An application configured with a database
         testApplication {
             val client = configureApplicationAndCreateClient(MONGO_SERVER)
@@ -119,10 +124,8 @@ class AuthorsApiE2eTest {
         }
     }
 
-
     @Test
     fun `POST on authors should return HTTP 409 Conflict when creating an existing author (firstname, lastname)`() {
-
         // GIVEN An application configured with a database
         testApplication {
             val client = configureApplicationAndCreateClient(MONGO_SERVER)
@@ -149,4 +152,3 @@ class AuthorsApiE2eTest {
         }
     }
 }
-

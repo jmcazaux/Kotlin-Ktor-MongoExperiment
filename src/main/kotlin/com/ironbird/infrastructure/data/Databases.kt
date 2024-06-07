@@ -1,16 +1,18 @@
 package com.ironbird.infrastructure.data
 
-
 import com.ironbird.infrastructure.data.repository.AuthorRepositoryImpl
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import io.ktor.server.application.*
-import io.ktor.server.config.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationStopped
+import io.ktor.server.config.tryGetString
 import org.bson.UuidRepresentation
 
 const val DATABASE_NAME = "ironbird_library"
+
+private const val DEFAULT_MAX_POOL_SIZE = 20
 
 /**
  * Establishes connection with a MongoDB database.
@@ -34,7 +36,7 @@ fun Application.connectToMongoDB(): MongoDatabase {
     val password = environment.config.tryGetString("db.mongo.password")
     val host = environment.config.tryGetString("db.mongo.host") ?: "127.0.0.1"
     val port = environment.config.tryGetString("db.mongo.port") ?: "27017"
-    val maxPoolSize = environment.config.tryGetString("db.mongo.maxPoolSize")?.toInt() ?: 20
+    val maxPoolSize = environment.config.tryGetString("db.mongo.maxPoolSize")?.toInt() ?: DEFAULT_MAX_POOL_SIZE
     val databaseName = environment.config.tryGetString("db.mongo.database.name") ?: DATABASE_NAME
 
     val credentials = user?.let { userVal -> password?.let { passwordVal -> "$userVal:$passwordVal@" } }.orEmpty()
@@ -53,7 +55,6 @@ internal fun createMongoClientAndDatabase(
     uri: String,
     databaseName: String
 ): Pair<MongoClient, MongoDatabase> {
-
     val mongoClient = MongoClient.create(
         MongoClientSettings.builder()
             .applyConnectionString(ConnectionString(uri))
